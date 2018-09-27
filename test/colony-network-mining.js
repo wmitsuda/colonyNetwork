@@ -442,17 +442,14 @@ contract("ColonyNetworkMining", accounts => {
     it("should not allow a new reputation hash to be set if more than one was submitted and they have not been elimintated", async () => {
       await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
       await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
-
       const repCycle = await getActiveRepCycle(colonyNetwork);
       await submitAndForwardTimeToDispute([goodClient, badClient], this);
 
-      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed");
-
-      const newRepCycle = await getActiveRepCycle(colonyNetwork);
-      assert.notEqual(newRepCycle.address, ZERO_ADDRESS);
-      assert.notEqual(repCycle.address, ZERO_ADDRESS);
-      assert.equal(newRepCycle.address, repCycle.address);
-
+      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed1");
+      const newAddr = await colonyNetwork.getReputationMiningCycle(true);
+      assert.isTrue(newAddr !== ZERO_ADDRESS);
+      assert.isTrue(repCycle.address !== ZERO_ADDRESS);
+      assert.isTrue(newAddr === repCycle.address);
       // Eliminate one so that the afterAll works.
       await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
     });
@@ -551,9 +548,7 @@ contract("ColonyNetworkMining", accounts => {
       await checkErrorRevert(repCycle.invalidateHash(0, 1), "colony-reputation-mining-not-timed-out");
 
       await forwardTime(MINING_CYCLE_DURATION / 2, this);
-
-      await checkErrorRevert(repCycle.confirmNewHash(1), "colony-reputation-mining-final-round-not-completed");
-
+      await checkErrorRevert(repCycle.confirmNewHash(1), "colony-reputation-mining-final-round-not-completed1");
       await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
       await repCycle.confirmNewHash(1);
     });
@@ -2143,7 +2138,7 @@ contract("ColonyNetworkMining", accounts => {
       await badClient.confirmJustificationRootHash();
 
       await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
-      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed");
+      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed2");
       await repCycle.confirmNewHash(1);
     });
 
@@ -2607,7 +2602,7 @@ contract("ColonyNetworkMining", accounts => {
       await badClient.confirmJustificationRootHash();
 
       await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
-      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed");
+      await checkErrorRevert(repCycle.confirmNewHash(0), "colony-reputation-mining-final-round-not-completed2");
       await repCycle.confirmNewHash(1);
     });
 
