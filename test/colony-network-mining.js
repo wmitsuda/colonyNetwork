@@ -1224,7 +1224,7 @@ contract("ColonyNetworkMining", accounts => {
       assert.equal(confirmedHash, righthash);
     });
 
-    it("If respondToChallenge is attempted to be called multiple times, it should fail", async () => {
+    it("if respondToChallenge is attempted to be called multiple times, it should fail", async () => {
       await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
       await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
       await advanceMiningCycleNoContest(colonyNetwork, this);
@@ -1288,7 +1288,6 @@ contract("ColonyNetworkMining", accounts => {
       assert.equal(goodSubmissionAfterResponseToChallenge[3].sub(badSubmissionAfterResponseToChallenge[3]).toNumber(), 1);
       // Both sides have completed the same amount of challenges, but one has proved that the reputation existed previously,
       // whereas the other has not, and any respondToChallenges after the first didn't work.
-
       await forwardTime(MINING_CYCLE_DURATION / 6, this);
       // Check that we can't invalidate the good client submission
       await checkErrorRevert(repCycle.invalidateHash(0, 0), "colony-reputation-mining-less-challenge-rounds-completed");
@@ -1499,8 +1498,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it.skip("if one person claims an origin skill doesn't exist but the other does (and proves such), should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
@@ -1574,9 +1573,9 @@ contract("ColonyNetworkMining", accounts => {
       await repCycle.confirmNewHash(1);
     });
 
-    it.only("if one person lies about what the origin skill is when there is an origin skill, should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+    it.skip("if one person lies about what the origin skill is when there is an origin skill, should be handled correctly", async () => {
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
@@ -1651,8 +1650,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("if a colony wide total calculation as a result of a child reputation update is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       const taskId1 = await setupRatedTask({
         colonyNetwork,
@@ -1724,8 +1723,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("if origin skill reputation calculation underflows and is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       const taskId1 = await setupRatedTask({
         colonyNetwork,
@@ -1796,11 +1795,11 @@ contract("ColonyNetworkMining", accounts => {
       await repCycle.confirmNewHash(1);
     });
 
-    it("if origin skill reputation calculation overflows and is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+    it("if a child reputation calculation is wrong, it should be handled correctly", async () => {
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
-      const taskId1 = await setupRatedTask({
+      await setupFinalizedTask({
         colonyNetwork,
         colony: metaColony,
         skill: 5,
@@ -1811,7 +1810,6 @@ contract("ColonyNetworkMining", accounts => {
         workerRating: 3,
         worker: OTHER_ACCOUNT
       });
-      await metaColony.finalizeTask(taskId1);
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
@@ -1819,7 +1817,7 @@ contract("ColonyNetworkMining", accounts => {
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
-      const taskId2 = await setupRatedTask({
+      await setupFinalizedTask({
         colonyNetwork,
         colony: metaColony,
         skill: 4,
@@ -1830,7 +1828,7 @@ contract("ColonyNetworkMining", accounts => {
         workerRating: 1,
         worker: OTHER_ACCOUNT
       });
-      await metaColony.finalizeTask(taskId2);
+
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
       await forwardTime(3600, this);
@@ -1870,8 +1868,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("if a child reputation calculation is wrong, it should be handled correctly if that user has never had that reputation before", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
@@ -1929,8 +1927,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it.skip("if a child reputation colony-wide calculation is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       const taskId1 = await setupRatedTask({
         colonyNetwork,
@@ -2002,8 +2000,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("if main skill (in a negative update) reputation calculation is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       const taskId1 = await setupRatedTask({
         colonyNetwork,
@@ -2075,8 +2073,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("if a colony-wide main skill reputation amount calculation underflows and is wrong, it should be handled correctly", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       const taskId1 = await setupRatedTask({
         colonyNetwork,
@@ -2280,8 +2278,8 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     it("should correctly check the proof of the origin skill reputation, if necessary", async () => {
-      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, "1000000000000000000");
-      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, "1000000000000000000");
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
@@ -2351,6 +2349,9 @@ contract("ColonyNetworkMining", accounts => {
       await badClient.respondToBinarySearchForChallenge();
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
+
+      await goodClient.confirmBinarySearchResult();
+      await badClient.confirmBinarySearchResult();
 
       // Now get all the information needed to fire off a respondToChallenge call
       const [round, index] = await goodClient.getMySubmissionRoundAndIndex();
@@ -2833,7 +2834,6 @@ contract("ColonyNetworkMining", accounts => {
       // Check we can't respond to challenge before we've completed the binary search
       await checkErrorRevertEthers(goodClient.respondToChallenge(), "colony-reputation-mining-challenge-closed");
       await goodClient.respondToBinarySearchForChallenge();
-
       // Check we can't confirm even if we're done, but our opponent isn't
       await checkErrorRevertEthers(goodClient.confirmBinarySearchResult(), "colony-reputation-binary-search-incomplete");
       await badClient.respondToBinarySearchForChallenge();
@@ -2848,7 +2848,6 @@ contract("ColonyNetworkMining", accounts => {
       // Check we can't continue confirming
       await checkErrorRevertEthers(goodClient.respondToBinarySearchForChallenge(), "colony-reputation-mining-challenge-not-active");
       await goodClient.respondToChallenge();
-
       // Check we can't respond again
       await checkErrorRevertEthers(goodClient.respondToChallenge(), "colony-reputation-mining-challenge-already-responded");
 
@@ -3202,7 +3201,7 @@ contract("ColonyNetworkMining", accounts => {
             colonyNetwork,
             colony: metaColony,
             colonyToken: clny,
-            workerRating: 1,
+            workerRating: 2,
             managerPayout: 1,
             evaluatorPayout: 1,
             workerPayout: 1
@@ -3877,10 +3876,12 @@ contract("ColonyNetworkMining", accounts => {
   });
 
   async function advanceTimeSubmitAndConfirmHash(test) {
-    await forwardTime(MINING_CYCLE_DURATION, test);
+    await forwardTime(MINING_CYCLE_DURATION-200, test);
     await goodClient.addLogContentsToReputationTree();
     await goodClient.submitRootHash();
+
     const repCycle = await getActiveRepCycle(colonyNetwork);
+    await forwardTime(200, test);
     await repCycle.confirmNewHash(0);
   }
 
