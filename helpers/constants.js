@@ -27,6 +27,7 @@ const MANAGER_PAYOUT = WAD.muln(100);
 const EVALUATOR_PAYOUT = WAD.muln(50);
 const WORKER_PAYOUT = WAD.muln(200);
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const MANAGER_RATING = 2;
 const WORKER_RATING = 2;
 const RATING_MULTIPLIER = { 1: -1, 2: 1, 3: 1.5 };
@@ -41,6 +42,7 @@ const CANCELLED_TASK_STATE = 1;
 const FINALIZED_TASK_STATE = 2;
 
 const SECONDS_PER_DAY = 86400;
+
 const MINING_CYCLE_DURATION = 60 * 60 * 24; // 24 hours
 const DECAY_RATE = {
   NUMERATOR:    new BN("992327946262944"), // eslint-disable-line prettier/prettier
@@ -77,5 +79,6 @@ module.exports = {
   FINALIZED_TASK_STATE,
   SECONDS_PER_DAY,
   MINING_CYCLE_DURATION,
-  DECAY_RATE
+  DECAY_RATE,
+  ZERO_ADDRESS
 };
