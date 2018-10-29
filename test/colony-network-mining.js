@@ -3330,7 +3330,7 @@ contract("ColonyNetworkMining", accounts => {
     });
 
     afterEach(async () => {
-      client.close();
+      await client.close();
     });
 
     it("should correctly respond to a request for a reputation state in the current state", async () => {

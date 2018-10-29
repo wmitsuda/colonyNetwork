@@ -4,6 +4,8 @@ const BN = require("bn.js");
 
 const ReputationMiner = require("./ReputationMiner");
 
+const MINING_CYCLE_LENGTH = 3600 * 24;
+
 class ReputationMinerClient {
   /**
    * Constructor for ReputationMiner
@@ -83,7 +85,7 @@ class ReputationMinerClient {
     }
 
     console.log("🏁 Initialised");
-    if (this.auto) {
+    if (this._auto) {
       this.timeout = setTimeout(() => this.checkSubmissionWindow(), 0);
     }
   }
@@ -106,7 +108,7 @@ class ReputationMinerClient {
 
     const block = await this._miner.realProvider.getBlock("latest");
     const now = block.timestamp;
-    if (now - windowOpened > 3600) {
+    if (now - windowOpened > MINING_CYCLE_LENGTH) {
       console.log("⏰ Looks like it's time to submit an update");
       // If so, process the log
       await this._miner.addLogContentsToReputationTree();
@@ -131,15 +133,15 @@ class ReputationMinerClient {
       tx = await repCycle.confirmNewHash(0, { gasLimit: 3500000, nonce: tx.nonce + 1 });
 
       console.log("✅ New reputation hash confirmed, via TX", tx);
-      // this.timeout = setTimeout(() => this.checkSubmissionWindow(), 3660000);
-      // console.log("⌛️ will next check in one hour and one minute");
-      this.timeout = setTimeout(() => this.checkSubmissionWindow(), 10000);
+      this.timeout = setTimeout(() => this.checkSubmissionWindow(), MINING_CYCLE_LENGTH * 1000);
+      console.log("⌛️ will next check in one day");
+      // this.timeout = setTimeout(() => this.checkSubmissionWindow(), 10000);
     } else {
       // Set a timeout for 3610 - (now - windowOpened)
-      this.timeout = setTimeout(() => this.checkSubmissionWindow(), 10000);
-      // const timeout = Math.max(3610 - (now - windowOpened), 10);
-      // console.log("⌛️ will next check in ", timeout, "seconds");
-      // this.timeout = setTimeout(() => this.checkSubmissionWindow(), timeout * 1000);
+      // this.timeout = setTimeout(() => this.checkSubmissionWindow(), 10000);
+      const timeout = Math.max(MINING_CYCLE_LENGTH + 10 - (now - windowOpened), 10);
+      console.log("⌛️ will next check in ", timeout, "seconds");
+      this.timeout = setTimeout(() => this.checkSubmissionWindow(), timeout * 1000);
     }
   }
 }
