@@ -1511,7 +1511,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1531,7 +1531,7 @@ contract("ColonyNetworkMining", accounts => {
 
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -1583,7 +1583,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1659,7 +1659,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1748,7 +1748,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1766,7 +1766,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -1821,7 +1821,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1839,7 +1839,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -1893,7 +1893,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1911,7 +1911,7 @@ contract("ColonyNetworkMining", accounts => {
 
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -1953,7 +1953,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -1971,7 +1971,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -2025,7 +2025,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -2043,7 +2043,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -2098,7 +2098,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -2116,7 +2116,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -2171,7 +2171,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -2189,7 +2189,7 @@ contract("ColonyNetworkMining", accounts => {
       await metaColony.finalizeTask(taskId2);
       await goodClient.resetDB();
       await goodClient.addLogContentsToReputationTree();
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await goodClient.submitRootHash();
       await goodClient.saveCurrentState();
 
@@ -2367,7 +2367,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x12345678", 10, 10);
       await repCycle.confirmNewHash(0);
 
@@ -2399,7 +2399,7 @@ contract("ColonyNetworkMining", accounts => {
 
       addr = await colonyNetwork.getReputationMiningCycle(true);
       repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x00", 0, 10);
       await repCycle.confirmNewHash(0);
       addr = await colonyNetwork.getReputationMiningCycle(true);
@@ -3666,7 +3666,7 @@ contract("ColonyNetworkMining", accounts => {
 
       let addr = await colonyNetwork.getReputationMiningCycle(true);
       let repCycle = await IReputationMiningCycle.at(addr);
-      await forwardTime(3600, this);
+      await forwardTime(MINING_CYCLE_DURATION, this);
       await repCycle.submitRootHash("0x00", 0, 10);
       await repCycle.confirmNewHash(0);
 
@@ -3944,7 +3944,7 @@ contract("ColonyNetworkMining", accounts => {
   });
 
   async function advanceTimeSubmitAndConfirmHash(test) {
-    await forwardTime(MINING_CYCLE_DURATION-200, test);
+    await forwardTime(MINING_CYCLE_DURATION - 200, test);
     await goodClient.addLogContentsToReputationTree();
     await goodClient.submitRootHash();
 
