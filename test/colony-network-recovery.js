@@ -49,7 +49,7 @@ contract("Colony Network Recovery", accounts => {
     let addr = await colonyNetwork.getReputationMiningCycle.call(true);
     await forwardTime(MINING_CYCLE_DURATION, this);
     let repCycle = await IReputationMiningCycle.at(addr);
-    await repCycle.submitRootHash("0x00", 0, 10);
+    await repCycle.submitRootHash("0x00", 0, "0x00", 10);
     await repCycle.confirmNewHash(0);
 
     await giveUserCLNYTokensAndStake(colonyNetwork, accounts[4], DEFAULT_STAKE);
@@ -69,7 +69,7 @@ contract("Colony Network Recovery", accounts => {
     addr = await colonyNetwork.getReputationMiningCycle.call(true);
     repCycle = await IReputationMiningCycle.at(addr);
     await forwardTime(MINING_CYCLE_DURATION, this);
-    await repCycle.submitRootHash("0x00", 0, 10);
+    await repCycle.submitRootHash("0x00", 0, "0x00", 10);
     await repCycle.confirmNewHash(0);
 
     const block = await currentBlock();
@@ -203,7 +203,7 @@ contract("Colony Network Recovery", accounts => {
       const addr = await colonyNetwork.getReputationMiningCycle(true);
       const repCycle = await IReputationMiningCycle.at(addr);
       await forwardTime(MINING_CYCLE_DURATION, this);
-      await repCycle.submitRootHash("0x01", 0, 10);
+      await repCycle.submitRootHash("0x01", 0, "0x00", 10);
       await repCycle.confirmNewHash(0);
 
       let rootHash = await colonyNetwork.getReputationRootHash();

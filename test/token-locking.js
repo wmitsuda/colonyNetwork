@@ -54,7 +54,7 @@ contract("TokenLocking", addresses => {
     let addr = await colonyNetwork.getReputationMiningCycle.call(true);
     await forwardTime(MINING_CYCLE_DURATION, this);
     let repCycle = await IReputationMiningCycle.at(addr);
-    await repCycle.submitRootHash("0x00", 0, 10);
+    await repCycle.submitRootHash("0x00", 0, "0x00", 10);
     await repCycle.confirmNewHash(0);
 
     await giveUserCLNYTokensAndStake(colonyNetwork, addresses[4], DEFAULT_STAKE);
