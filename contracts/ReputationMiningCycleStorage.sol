@@ -37,8 +37,8 @@ contract ReputationMiningCycleStorage is DSAuth {
   address colonyNetworkAddress;
   address tokenLockingAddress;
   address clnyTokenAddress;
-  
-  mapping (bytes32 => mapping( uint256 => address[])) submittedHashes;
+
+  mapping (bytes32 => mapping( uint256 => mapping( bytes32 => address[]))) submittedHashes;
   mapping (address => Submission) reputationHashSubmissions;
   uint256 reputationMiningWindowOpenTimestamp;
   mapping (uint256 => Submission[]) disputeRounds;
@@ -82,6 +82,6 @@ contract ReputationMiningCycleStorage is DSAuth {
 
   // Records for which hashes, for which addresses, for which entries have been accepted
   // Otherwise, people could keep submitting the same entry.
-  mapping (bytes32 => mapping(address => mapping(uint256 => bool))) submittedEntries;
+  mapping (bytes32 => mapping(address => mapping(bytes32 => mapping(uint256 => bool)))) submittedEntries;
 
 }

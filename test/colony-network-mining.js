@@ -95,7 +95,7 @@ contract("ColonyNetworkMining", accounts => {
     let repCycle = await IReputationMiningCycle.at(addr);
 
     await forwardTime(MINING_CYCLE_DURATION, this);
-    await repCycle.submitRootHash("0x00", 0, 10);
+    await repCycle.submitRootHash("0x00", 0, "0x00", 10);
     await repCycle.confirmNewHash(0);
 
     // Advance another reputation cycle
@@ -103,7 +103,7 @@ contract("ColonyNetworkMining", accounts => {
     repCycle = await IReputationMiningCycle.at(addr);
 
     await forwardTime(MINING_CYCLE_DURATION, this);
-    await repCycle.submitRootHash("0x00", 0, 10);
+    await repCycle.submitRootHash("0x00", 0, "0x00", 10);
     await repCycle.confirmNewHash(0);
 
     // The inactive reputation log now has the reward for this miner, and the accepted state is empty.
@@ -134,8 +134,8 @@ contract("ColonyNetworkMining", accounts => {
     if (client2 !== undefined) {
       // Submit JRH for submission 1 if needed
       // We only do this if client2 is defined so that we test JRH submission in rounds other than round 0.
-      if (submission1before[4] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-        await client1.submitJustificationRootHash();
+      if (submission1before[7].toString() === "0") {
+        await client1.confirmJustificationRootHash();
       }
 
       [round2, idx2] = await client2.getMySubmissionRoundAndIndex();
@@ -148,8 +148,8 @@ contract("ColonyNetworkMining", accounts => {
           .eq(1),
         "Clients are not facing each other in this round"
       );
-      if (submission2before[4] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-        await client2.submitJustificationRootHash();
+      if (submission2before[7].toString() === "0") {
+        await client2.confirmJustificationRootHash();
       }
       // Loop while doing the binary search, checking we were successful at each point
       // Binary search will error when it is complete.
