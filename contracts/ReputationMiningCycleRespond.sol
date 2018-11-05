@@ -81,6 +81,8 @@ contract ReputationMiningCycleRespond is ReputationMiningCycleStorage, PatriciaT
   {
     u[U_REQUIRE_REPUTATION_CHECK] = 0;
     u[U_DECAY_TRANSITION] = 0;
+    // Require disagree state nnodes - agree state nnodes is either 0 or 1. Its a uint, so we can simplify this to < 2.
+    require(u[U_DISAGREE_STATE_NNODES] - u[U_AGREE_STATE_NNODES] < 2, "colony-network-mining-more-than-one-node-added");
     // TODO: More checks that this is an appropriate time to respondToChallenge (maybe in modifier);
     /* bytes32 jrh = disputeRounds[round][idx].jrh; */
     // The contract knows
@@ -254,10 +256,12 @@ contract ReputationMiningCycleRespond is ReputationMiningCycleStorage, PatriciaT
     // agree on.
     bytes32 impliedRoot = getImpliedRoot(lastAgreeIdxBytes, jhLeafValue, u[U_AGREE_STATE_BRANCH_MASK], agreeStateSiblings);
 
-    if (reputationValue == 0 && impliedRoot != jrh) {
+    if (u[U_DISAGREE_STATE_NNODES] - u[U_AGREE_STATE_NNODES] == 1) {
       // This implies they are claiming that this is a new hash.
+      // TODO: Move to top of function.
       return;
     }
+
     require(impliedRoot == jrh, "colony-reputation-mining-invalid-before-reputation-proof");
     // They've actually verified whatever they claimed. We increment their challengeStepCompleted by one to indicate this.
     // In the event that our opponent lied about this reputation not existing yet in the tree, they will both complete
@@ -391,7 +395,7 @@ contract ReputationMiningCycleRespond is ReputationMiningCycleStorage, PatriciaT
     // Could be zero if this is an update to an existing reputation, or it could be 1 if we have just added a new
     // reputation. Anything else is inconsistent.
     // We don't care about over/underflowing, and don't want to use `sub` so that this require message is returned.
-    require(delta == 0 || delta == 1, "colony-reputation-mining-proved-uid-inconsistent");
+    require(delta == u[U_DISAGREE_STATE_NNODES]-u[U_AGREE_STATE_NNODES], "colony-reputation-mining-proved-uid-inconsistent");
     // Save the index for tiebreak scenarios later.
     disputeRounds[u[U_ROUND]][u[U_IDX]].provedPreviousReputationUID = previousReputationUID;
   }
