@@ -95,6 +95,7 @@ class ReputationMiner {
     } else {
       this.realWallet = new ethers.Wallet(privateKey, this.realProvider);
       // TODO: Check that this wallet can stake?
+      this.minerAddress = this.realWallet.address;
       console.log("Transactions will be signed from ", this.realWallet.address);
     }
   }
