@@ -130,7 +130,7 @@ class ReputationMinerClient {
       // Confirm hash
       // We explicitly use the previous nonce +1, in case we're using Infura and we end up
       // querying a node that hasn't had the above transaction propagate to it yet.
-      tx = await repCycle.confirmNewHash(0, { gasLimit: 3500000, nonce: tx.nonce + 1 });
+      tx = await repCycle.confirmNewHash(0, { gasLimit: 1500000, nonce: tx.nonce + 1 });
 
       console.log("✅ New reputation hash confirmed, via TX", tx);
       this.timeout = setTimeout(() => this.checkSubmissionWindow(), MINING_CYCLE_LENGTH * 1000);
