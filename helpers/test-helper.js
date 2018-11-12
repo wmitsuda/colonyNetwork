@@ -295,8 +295,8 @@ export async function createSignatures(colony, taskId, signers, value, data) {
     let user = signers[i].toString();
     user = user.toLowerCase();
     const privKey = accountsJson.private_keys[user];
-    const prefixedMessageHash = await ethUtils.hashPersonalMessage(Buffer.from(msgHash.slice(2), "hex")); // eslint-disable-line no-await-in-loop
-    const sig = await ethUtils.ecsign(prefixedMessageHash, Buffer.from(privKey, "hex")); // eslint-disable-line no-await-in-loop
+    const prefixedMessageHash = await ethUtils.hashPersonalMessage(Buffer.from(msgHash.slice(2), "hex"));
+    const sig = await ethUtils.ecsign(prefixedMessageHash, Buffer.from(privKey, "hex"));
 
     sigV.push(sig.v);
     sigR.push(`0x${sig.r.toString("hex")}`);
@@ -390,7 +390,7 @@ export async function getValidEntryNumber(colonyNetwork, account, hash, starting
   // or return an error
   const timestamp = await currentBlockTime();
   for (let i = startingEntryNumber; i <= nIter; i += 1) {
-    const entryHash = await repCycle.getEntryHash(account, i, hash); // eslint-disable-line no-await-in-loop
+    const entryHash = await repCycle.getEntryHash(account, i, hash);
     const target = new BN(timestamp).sub(reputationMiningWindowOpenTimestamp).mul(constant);
     if (new BN(entryHash.slice(2), 16).lt(target)) {
       return i;
@@ -402,8 +402,8 @@ export async function getValidEntryNumber(colonyNetwork, account, hash, starting
 export async function submitAndForwardTimeToDispute(clients, test) {
   await forwardTime(MINING_CYCLE_DURATION / 2, test);
   for (let i = 0; i < clients.length; i += 1) {
-    await clients[i].addLogContentsToReputationTree(); // eslint-disable-line no-await-in-loop
-    await clients[i].submitRootHash(); // eslint-disable-line no-await-in-loop
+    await clients[i].addLogContentsToReputationTree();
+    await clients[i].submitRootHash();
   }
   await forwardTime(MINING_CYCLE_DURATION / 2, test);
 }
