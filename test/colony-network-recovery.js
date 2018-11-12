@@ -389,7 +389,7 @@ contract("Colony Network Recovery", accounts => {
             const logEntry = await oldActiveCycle.getReputationUpdateLogEntry(i);
             await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot, `0x000000000000000000000000${logEntry[0].slice(2)}`);
             await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot.addn(1), `0x${padLeft(logEntry[1].toTwos(256), 64)}`);
-            await newActiveCycleAsRecovery.setStåorageSlot(logEntryStartingSlot.addn(2), `0x${logEntry[2].toString(16, 64)}`);
+            await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot.addn(2), `0x${logEntry[2].toString(16, 64)}`);
             await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot.addn(3), `0x000000000000000000000000${logEntry[3].slice(2)}`);
             await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot.addn(4), `0x${logEntry[4].toString(16, 64)}`);
             await newActiveCycleAsRecovery.setStorageSlot(logEntryStartingSlot.addn(5), `0x${logEntry[5].toString(16, 64)}`);
