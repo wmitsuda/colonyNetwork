@@ -232,6 +232,9 @@ contract DutchAuction is DSMath {
     // Transfer token remainder to the network
     uint auctionTokenBalance = token.balanceOf(this);
     token.transfer(colonyNetwork, auctionTokenBalance);
+    // Transfer CLNY remainder to the meta colony. There shouldn't be any left at this point but just in case..
+    uint auctionClnyBalance = clnyToken.balanceOf(this);
+    clnyToken.transfer(metaColony, auctionClnyBalance);
     // Check this contract balances in the working tokens is 0 before we kill it
     assert(clnyToken.balanceOf(this) == 0);
     assert(token.balanceOf(this) == 0);
