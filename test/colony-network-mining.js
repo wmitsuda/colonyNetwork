@@ -1079,7 +1079,7 @@ contract("ColonyNetworkMining", accounts => {
 
       // TODO: Split off in to  another test here, but can't be bothered to refactor right now.
       await goodClient.respondToChallenge();
-      await checkErrorRevertEthers(badClient.respondToChallenge(), "colony-reputation-mining-invalid-newest-reputation-proof");
+      await checkErrorRevertEthers(badClient.respondToChallenge(), "colony-reputation-mining-increased-reputation-value-incorrect");
 
       // Check
       const goodSubmissionAfterResponseToChallenge = await repCycle.getDisputeRounds(0, 0);
@@ -1327,8 +1327,8 @@ contract("ColonyNetworkMining", accounts => {
       await goodClient.respondToChallenge();
       await badClient.respondToChallenge();
 
-      await checkErrorRevert(badClient.respondToChallenge());
-      await checkErrorRevert(badClient.respondToChallenge());
+      await checkErrorRevertEthers(goodClient.respondToChallenge(), "colony-reputation-mining-challenge-already-responded");
+      await checkErrorRevertEthers(badClient.respondToChallenge(), "colony-reputation-mining-challenge-already-responded");
 
       // Check
       const goodSubmissionAfterResponseToChallenge = await repCycle.getDisputeRounds(0, 0);
