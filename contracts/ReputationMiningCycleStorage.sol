@@ -78,6 +78,9 @@ contract ReputationMiningCycleStorage is DSAuth {
                                           // new leaf, the submitters also submit proof of a reputation in a state that the two agree on. The
                                           // UID that reputation has is stored here, and whichever submission proves the higher existing UID is
                                           // deemed correct, assuming it also matches the UID for the new reputation being inserted.
+    bytes32 targetHashDuringSearch;
+    bytes32 hash1;
+    bytes32 hash2;                                      
   }
 
   // Records for which hashes, for which addresses, for which entries have been accepted

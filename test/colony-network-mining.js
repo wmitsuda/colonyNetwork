@@ -27,6 +27,7 @@ import MaliciousReputationMinerWrongProofLogEntry from "../packages/reputation-m
 import MaliciousReputationMinerWrongNewestReputation from "../packages/reputation-miner/test/MaliciousReputationMinerWrongNewestReputation";
 import MaliciousReputationMinerClaimNew from "../packages/reputation-miner/test/MaliciousReputationMinerClaimNew";
 import MaliciousReputationMinerUnsure from "../packages/reputation-miner/test/MaliciousReputationMinerUnsure";
+import MaliciousReputationMinerWrongJRH from "../packages/reputation-miner/test/MaliciousReputationMinerWrongJRH";
 
 import ReputationMinerClient from "../packages/reputation-miner/ReputationMinerClient";
 
@@ -633,6 +634,21 @@ contract("ColonyNetworkMining", accounts => {
       await forwardTime(MINING_CYCLE_DURATION / 2, this);
     });
 
+    it("should not allow a user to back the same hash with same number of nodes but different JRH in a single cycle", async () => {
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+
+      const addr = await colonyNetwork.getReputationMiningCycle(true);
+      const repCycle = await IReputationMiningCycle.at(addr);
+      await forwardTime(MINING_CYCLE_DURATION / 2, this);
+      const entryNumber = await getValidEntryNumber(colonyNetwork, MAIN_ACCOUNT, "0x12345678");
+      await repCycle.submitRootHash("0x12345678", 10, "0x00", entryNumber);
+
+      await checkErrorRevert(repCycle.submitRootHash("0x12345678", 10, "0x01", entryNumber), "colony-reputation-mining-submitting-different-jrh");
+      const nSubmittedHashes = await repCycle.getNSubmittedHashes();
+      assert(nSubmittedHashes.eq(new BN(1)));
+      await forwardTime(MINING_CYCLE_DURATION / 2, this);
+    });
+
     it("should not allow a user to submit the same entry for the same hash twice in a single cycle", async () => {
       await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
 
@@ -908,6 +924,61 @@ contract("ColonyNetworkMining", accounts => {
       await repCycle.confirmNewHash(1);
     });
 
+    it.skip("in the event of a disagreement just over JRH, dispute should be resolved correctly", async () => {
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
+
+      let addr = await colonyNetwork.getReputationMiningCycle(true);
+      let repCycle = await IReputationMiningCycle.at(addr);
+      await forwardTime(MINING_CYCLE_DURATION, this);
+      await repCycle.submitRootHash("0x12345678", 10, "0x00", 10);
+      await repCycle.confirmNewHash(0);
+
+      await giveUserCLNYTokens(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokens(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokens(colonyNetwork, accounts[2], DEFAULT_STAKE);
+      addr = await colonyNetwork.getReputationMiningCycle(true);
+      repCycle = await IReputationMiningCycle.at(addr);
+      await forwardTime(MINING_CYCLE_DURATION, this);
+      await repCycle.submitRootHash("0x00", 0, "0x00", 10);
+      await repCycle.confirmNewHash(0);
+      addr = await colonyNetwork.getReputationMiningCycle(true);
+      repCycle = await IReputationMiningCycle.at(addr);
+
+      // The update log should contain the person being rewarded for the previous
+      // update cycle, and reputation updates for three task completions (manager, worker, evaluator);
+      // That's seven in total.
+      const nInactiveLogEntries = await repCycle.getReputationUpdateLogLength();
+      assert.equal(nInactiveLogEntries.toNumber(), 13);
+      badClient = new MaliciousReputationMinerWrongJRH({
+        loader: contractLoader,
+        minerAddress: OTHER_ACCOUNT,
+        realProviderPort: REAL_PROVIDER_PORT,
+        useJsTree
+      });
+      await badClient.initialise(colonyNetwork.address);
+      await submitAndForwardTimeToDispute([goodClient, badClient], this);
+
+      const nSubmittedHashes = await repCycle.getNSubmittedHashes();
+      assert.equal(nSubmittedHashes, 2);
+      const submission = await repCycle.getDisputeRounds(0, 0);
+      assert.equal(submission[7].toString(), "0");
+      await forwardTime(10, this); // This is just to ensure that the timestamps checked below will be different if JRH was submitted.
+
+      await goodClient.confirmJustificationRootHash();
+
+      const submissionAfterJRHConfirmed = await repCycle.getDisputeRounds(0, 0);
+      const jrh = await goodClient.justificationTree.getRootHash();
+      assert.equal(submissionAfterJRHConfirmed[4], jrh);
+
+      // Check 'last response' was updated.
+      assert.notEqual(submission[2].toString(), submissionAfterJRHConfirmed[2].toString());
+
+      // Cleanup
+      await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
+      await repCycle.confirmNewHash(1);
+    });
+
     it("should cope if the wrong reputation transition is the first transition", async () => {
       await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
       await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
@@ -1068,27 +1139,29 @@ contract("ColonyNetworkMining", accounts => {
       goodSubmission = await repCycle.getDisputeRounds(0, 0);
       badSubmission = await repCycle.getDisputeRounds(0, 1);
       assert.equal(goodSubmission[8].toNumber(), 0);
-      assert.equal(goodSubmission[9].toNumber(), 14);
+      assert.equal(goodSubmission[9].toNumber(), 15);
       assert.equal(badSubmission[8].toNumber(), 0);
-      assert.equal(badSubmission[9].toNumber(), 14);
+      assert.equal(badSubmission[9].toNumber(), 15);
 
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
       goodSubmission = await repCycle.getDisputeRounds(0, 0);
       badSubmission = await repCycle.getDisputeRounds(0, 1);
+      // console.log(goodSubmission);
+      // console.log(badSubmission);
       assert.equal(goodSubmission[8].toNumber(), 8);
-      assert.equal(goodSubmission[9].toNumber(), 14);
+      assert.equal(goodSubmission[9].toNumber(), 15);
       assert.equal(badSubmission[8].toNumber(), 8);
-      assert.equal(badSubmission[9].toNumber(), 14);
+      assert.equal(badSubmission[9].toNumber(), 15);
 
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
       goodSubmission = await repCycle.getDisputeRounds(0, 0);
       badSubmission = await repCycle.getDisputeRounds(0, 1);
       assert.equal(goodSubmission[8].toNumber(), 12);
-      assert.equal(goodSubmission[9].toNumber(), 14);
+      assert.equal(goodSubmission[9].toNumber(), 15);
       assert.equal(badSubmission[8].toNumber(), 12);
-      assert.equal(badSubmission[9].toNumber(), 14);
+      assert.equal(badSubmission[9].toNumber(), 15);
 
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
