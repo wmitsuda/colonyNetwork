@@ -64,6 +64,7 @@ contract("Colony Network Recovery", accounts => {
       realProviderPort: REAL_PROVIDER_PORT,
       useJsTree: true
     });
+    await miningClient.resetDB();
     await miningClient.initialise(colonyNetwork.address);
 
     addr = await colonyNetwork.getReputationMiningCycle.call(true);

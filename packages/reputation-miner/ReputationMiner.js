@@ -664,9 +664,6 @@ class ReputationMiner {
     branchMask = new BN(branchMask.toString());
 
     while (siblings.length > 1 && searchInfo[0] !== proofEndingHash) {
-      // Zero the leftmost set bit of branchMask
-      const largestBit = branchMask.bitLength();
-      branchMask = branchMask.maskn(largestBit - 1);
       // Remove the first sibling
       siblings = siblings.slice(1);
       // Recalulate ending hash
@@ -675,8 +672,7 @@ class ReputationMiner {
         targetNodeKey,
         this.justificationHashes[targetNodeKey].jhLeafValue,
         branchMask,
-        siblings,
-        false
+        siblings
       );
     }
     return repCycle.respondToBinarySearchForChallenge(round, index, intermediateReputationHash, branchMask.toString(), siblings, {
