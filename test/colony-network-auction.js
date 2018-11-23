@@ -315,18 +315,19 @@ contract("ColonyNetworkAuction", accounts => {
 
       await tokenAuction.finalize();
       const receivedTotal = await tokenAuction.receivedTotal();
-      const endPrice = WAD.mul(new BN(receivedTotal.toString(10)))
+      const endPrice = WAD.mul(receivedTotal)
         .div(quantity)
         .addn(1);
       const finalPrice = await tokenAuction.finalPrice();
       assert.equal(endPrice.toString(), finalPrice.toString(10));
     });
 
-    it("auction closes when the receivedTotal goes over the total amount to end the auction for quantity > 1e18", async () => {
+    it("auction closes when the receivedTotal goes over the total amount to end the auction for quantity < 1e18", async () => {
       const args = getTokenArgs();
       const otherToken = await Token.new(...args);
-      await otherToken.mint(1e16);
-      await otherToken.transfer(colonyNetwork.address, 1e16);
+      const totalAmount = new BN(10).pow(new BN(16));
+      await otherToken.mint(totalAmount);
+      await otherToken.transfer(colonyNetwork.address, totalAmount);
       const { logs } = await colonyNetwork.startTokenAuction(otherToken.address);
       const auctionAddress = logs[0].args.auction;
       tokenAuction = await DutchAuction.at(auctionAddress);
@@ -377,8 +378,9 @@ contract("ColonyNetworkAuction", accounts => {
     it("functions correctly even when price has reached the minimum for quantity < 1e18", async () => {
       const args = getTokenArgs();
       const otherToken = await Token.new(...args);
-      await otherToken.mint(1e16);
-      await otherToken.transfer(colonyNetwork.address, 1e16);
+      const totalAmount = new BN(10).pow(new BN(16));
+      await otherToken.mint(totalAmount);
+      await otherToken.transfer(colonyNetwork.address, totalAmount);
       const { logs } = await colonyNetwork.startTokenAuction(otherToken.address);
       const auctionAddress = logs[0].args.auction;
       tokenAuction = await DutchAuction.at(auctionAddress);
