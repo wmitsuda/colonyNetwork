@@ -28,6 +28,7 @@ import MaliciousReputationMinerWrongNewestReputation from "../packages/reputatio
 import MaliciousReputationMinerClaimNew from "../packages/reputation-miner/test/MaliciousReputationMinerClaimNew";
 import MaliciousReputationMinerUnsure from "../packages/reputation-miner/test/MaliciousReputationMinerUnsure";
 import MaliciousReputationMinerWrongJRH from "../packages/reputation-miner/test/MaliciousReputationMinerWrongJRH";
+import MaliciousReputationMinerAddNewReputation from "../packages/reputation-miner/test/MaliciousReputationMinerAddNewReputation";
 
 import ReputationMinerClient from "../packages/reputation-miner/ReputationMinerClient";
 
@@ -868,6 +869,46 @@ contract("ColonyNetworkMining", accounts => {
   });
 
   describe("Types of disagreement", () => {
+    it("should cope when a new reputation is correctly added and an extra reputation is added elsewhere at the same time", async () => {
+      await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
+      await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
+      badClient = new MaliciousReputationMinerAddNewReputation(
+        { loader: contractLoader, minerAddress: OTHER_ACCOUNT, realProviderPort: REAL_PROVIDER_PORT, useJsTree },
+        27
+      );
+      await badClient.initialise(colonyNetwork.address);
+
+      let addr = await colonyNetwork.getReputationMiningCycle(true);
+      let repCycle = await IReputationMiningCycle.at(addr);
+
+      const taskId = await setupRatedTask({
+        colonyNetwork,
+        colony: metaColony,
+        worker: accounts[4],
+        managerPayout: 1000000000000,
+        evaluatorPayout: 1000000000000,
+        workerPayout: 1000000000000,
+        managerRating: 3,
+        workerRating: 3
+      });
+      await metaColony.finalizeTask(taskId);
+
+      await forwardTime(MINING_CYCLE_DURATION, this);
+      await repCycle.submitRootHash("0x00", 0, 10);
+      await repCycle.confirmNewHash(0);
+
+      addr = await colonyNetwork.getReputationMiningCycle(true);
+      repCycle = await IReputationMiningCycle.at(addr);
+
+      await submitAndForwardTimeToDispute([goodClient, badClient], this);
+
+      await goodClient.submitJustificationRootHash();
+      await badClient.submitJustificationRootHash();
+
+      await accommodateChallengeAndInvalidateHash(this, goodClient, badClient);
+      await repCycle.confirmNewHash(1);
+    });
+
     it("in the event of a disagreement, allows a user to confirm a submitted JRH with proofs for a submission", async () => {
       await giveUserCLNYTokensAndStake(colonyNetwork, MAIN_ACCOUNT, DEFAULT_STAKE);
       await giveUserCLNYTokensAndStake(colonyNetwork, OTHER_ACCOUNT, DEFAULT_STAKE);
