@@ -11,7 +11,7 @@ const SPECIFICATION_HASH_UPDATED = "0x017dfd85d4f6cb4dcd715a88101f7b1f06cd1e009b
 // The base58 decoded, bytes32 converted hex value of a test task ipfsHash "qmv8ndh7ageh9b24zngaextmuhj7aiuw3scc8hkczvjkww"
 const DELIVERABLE_HASH = "0xfb027a4d64f29d83e27769cb05d945e67ef7396fa1bd73ef53f065311fd3313e";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const INITIAL_FUNDING = 360 * 1e18;
+const INITIAL_FUNDING = toBN(360 * 1e18);
 const MANAGER_PAYOUT = toBN(100 * 1e18);
 const EVALUATOR_PAYOUT = toBN(50 * 1e18);
 const WORKER_PAYOUT = toBN(200 * 1e18);
