@@ -1692,8 +1692,8 @@ contract("ColonyNetworkMining", accounts => {
           realProviderPort: REAL_PROVIDER_PORT,
           useJsTree
         },
-        30,
-        29
+        31,
+        30
       );
       // Moving the state to the bad client
       await badClient.initialise(colonyNetwork.address);
