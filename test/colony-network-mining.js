@@ -2656,8 +2656,8 @@ contract("ColonyNetworkMining", accounts => {
       await badClient.initialise(colonyNetwork.address);
       await submitAndForwardTimeToDispute([goodClient, badClient], this);
 
-      await goodClient.submitJustificationRootHash();
-      await badClient.submitJustificationRootHash();
+      await goodClient.confirmJustificationRootHash();
+      await badClient.confirmJustificationRootHash();
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
       await goodClient.respondToBinarySearchForChallenge();
@@ -2683,6 +2683,7 @@ contract("ColonyNetworkMining", accounts => {
       const [agreeStateBranchMask, agreeStateSiblings] = await goodClient.justificationTree.getProof(`0x${lastAgreeIdx.toString(16, 64)}`);
       const [disagreeStateBranchMask, disagreeStateSiblings] = await goodClient.justificationTree.getProof(`0x${firstDisagreeIdx.toString(16, 64)}`);
       const logEntryNumber = await goodClient.getLogEntryNumberForLogUpdateNumber(lastAgreeIdx.toString());
+
       await checkErrorRevert(
         repCycle.respondToChallenge(
           [
@@ -2697,7 +2698,7 @@ contract("ColonyNetworkMining", accounts => {
             logEntryNumber.toString(),
             0,
             // This is the wrong value
-            0x0,
+            disagreeStateBranchMask.toString(),
             // This is the correct line, for future reference
             // goodClient.justificationHashes[`0x${lastAgreeIdx.toString(16, 64)}`].originReputationProof.branchMask
             goodClient.justificationHashes[`0x${lastAgreeIdx.toString(16, 64)}`].nextUpdateProof.reputation,
@@ -3163,6 +3164,8 @@ contract("ColonyNetworkMining", accounts => {
       await goodClient.respondToBinarySearchForChallenge();
       await badClient.respondToBinarySearchForChallenge();
       await goodClient.respondToBinarySearchForChallenge();
+      await badClient.respondToBinarySearchForChallenge();
+      await goodClient.respondToBinarySearchForChallenge();
 
       // We need one more response to binary search from each side. Check we can't confirm early
       await checkErrorRevertEthers(goodClient.confirmBinarySearchResult(), "colony-reputation-binary-search-incomplete");
@@ -3423,6 +3426,9 @@ contract("ColonyNetworkMining", accounts => {
     before(async () => {
       // We're not resetting the global skills tree as the Network is not reset
       // Initialise global skills tree: 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+      // await metaColony.addGlobalSkill(1);
+      // await metaColony.addGlobalSkill(4);
+
       await metaColony.addGlobalSkill(5);
       await metaColony.addGlobalSkill(6);
       await metaColony.addGlobalSkill(7);
@@ -3907,6 +3913,7 @@ contract("ColonyNetworkMining", accounts => {
         workerRating: 1
       });
 
+      await goodClient.addLogContentsToReputationTree();
       await advanceMiningCycleNoContest(colonyNetwork, this, goodClient);
 
       // The update log should contain the person being rewarded for the previous update cycle,
