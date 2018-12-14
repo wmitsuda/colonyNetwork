@@ -4,7 +4,7 @@ import shortid from "shortid";
 
 const UINT256_MAX = new BN(0).notn(256);
 const INT256_MAX = new BN(0).notn(255);
-const INT128_MAX = new BN(2).pow(new BN(127)).sub(new BN(1)); 
+const INT128_MAX = new BN(2).pow(new BN(127)).sub(new BN(1));
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const MANAGER_ROLE = 0;
@@ -27,7 +27,6 @@ const MANAGER_PAYOUT = WAD.muln(100);
 const EVALUATOR_PAYOUT = WAD.muln(50);
 const WORKER_PAYOUT = WAD.muln(200);
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const MANAGER_RATING = 2;
 const WORKER_RATING = 2;
 const RATING_MULTIPLIER = { 1: -1, 2: 1, 3: 1.5 };
@@ -79,6 +78,5 @@ module.exports = {
   FINALIZED_TASK_STATE,
   SECONDS_PER_DAY,
   MINING_CYCLE_DURATION,
-  DECAY_RATE,
-  ZERO_ADDRESS
+  DECAY_RATE
 };
